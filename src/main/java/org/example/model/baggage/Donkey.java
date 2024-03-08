@@ -10,17 +10,7 @@ import java.time.LocalDate;
 public class Donkey extends PackAnimal {
 
     public Donkey(String name, LocalDate birthday) {
-        super("Ослы", name, birthday);
+        super("Осёл", name, birthday);
     }
 
-    @Override
-    public String toString() {
-        return "Donkey{" +
-                "animalGroup='" + animalGroup + '\'' +
-                ", animalType='" + animalType + '\'' +
-                ", name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", commands=" + commands +
-                '}';
-    }
 }

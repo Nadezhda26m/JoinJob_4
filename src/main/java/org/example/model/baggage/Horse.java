@@ -9,19 +9,8 @@ import java.time.LocalDate;
  */
 public class Horse extends PackAnimal {
 
-
     public Horse(String name, LocalDate birthday) {
-        super("Лошади", name, birthday);
+        super("Лошадь", name, birthday);
     }
 
-    @Override
-    public String toString() {
-        return "Horse{" +
-                "animalGroup='" + animalGroup + '\'' +
-                ", animalType='" + animalType + '\'' +
-                ", name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", commands=" + commands +
-                '}';
-    }
 }

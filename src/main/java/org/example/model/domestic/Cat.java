@@ -10,17 +10,7 @@ import java.time.LocalDate;
 public class Cat extends DomesticAnimal {
 
     public Cat(String name, LocalDate birthday) {
-        super("Кошки", name, birthday);
+        super("Кошка", name, birthday);
     }
 
-    @Override
-    public String toString() {
-        return "Cat{" +
-                "animalGroup='" + animalGroup + '\'' +
-                ", animalType='" + animalType + '\'' +
-                ", name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", commands=" + commands +
-                '}';
-    }
 }

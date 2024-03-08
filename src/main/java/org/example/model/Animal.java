@@ -27,5 +27,18 @@ public abstract class Animal {
     }
 
     @Override
-    public abstract String toString();
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id=").append(id);
+        sb.append(", группа: ").append(animalGroup);
+        sb.append(", вид: ").append(animalType);
+        sb.append(", кличка: ").append(name);
+        sb.append(", дата рождения: ").append(birthday);
+        sb.append(", список команд: ").append(commands);
+        return sb.toString();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

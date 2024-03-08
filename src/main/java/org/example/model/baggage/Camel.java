@@ -10,17 +10,7 @@ import java.time.LocalDate;
 public class Camel extends PackAnimal {
 
     public Camel(String name, LocalDate birthday) {
-        super("Верблюды", name, birthday);
+        super("Верблюд", name, birthday);
     }
 
-    @Override
-    public String toString() {
-        return "Camel{" +
-                "animalGroup='" + animalGroup + '\'' +
-                ", animalType='" + animalType + '\'' +
-                ", name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", commands=" + commands +
-                '}';
-    }
 }

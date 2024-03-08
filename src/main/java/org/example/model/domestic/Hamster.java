@@ -10,18 +10,7 @@ import java.time.LocalDate;
 public class Hamster extends DomesticAnimal {
 
     public Hamster(String name, LocalDate birthday) {
-        super("Хомяки", name, birthday);
+        super("Хомяк", name, birthday);
     }
 
-
-    @Override
-    public String toString() {
-        return "Hamster{" +
-                "animalGroup='" + animalGroup + '\'' +
-                ", animalType='" + animalType + '\'' +
-                ", name='" + name + '\'' +
-                ", birthday=" + birthday +
-                ", commands=" + commands +
-                '}';
-    }
 }

@@ -9,4 +9,8 @@ public class IncorrectDataException extends RuntimeException {
     public IncorrectDataException() {
         super("Некорректные данные");
     }
+
+    public IncorrectDataException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
