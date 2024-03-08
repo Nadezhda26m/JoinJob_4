@@ -13,6 +13,7 @@ import org.example.service.AnimalService;
 import org.example.service.Counter;
 import org.example.view.View;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -24,19 +25,9 @@ import java.util.List;
  */
 public class AnimalController {
 
-    /*
-    Завести новое животное
-    определять животное в правильный класс
-    увидеть список команд, которое выполняет животное
-    обучить животное новым командам
-    Реализовать навигацию по меню
-     */
-
     private final View view;
 
     private final AnimalService service;
-
-    private final Counter counter;
 
     private List<String> menu;
 
@@ -45,40 +36,42 @@ public class AnimalController {
     public AnimalController(View view, AnimalRepository repository) {
         this.view = view;
         this.service = new AnimalService(repository);
-        this.counter = new Counter();
-        this.menu = createMenuList();
-        this.animalTypes = createAnimalTypesList();
+        this.menu = new ArrayList<>();
+        this.animalTypes = new ArrayList<>();
+        createMenuList();
+        createAnimalTypesList();
     }
 
     public void run() {
         view.println("Добро пожаловать в приложение нашего питомника!");
-        int item = 1;
-        while (item != 0) {
-            view.println("\nВыберите пункт меню");
-            view.printNumberedList(menu, 0);
-            item = selectMenuItem(0, menu.size() - 1);
-            switch (item) {
-                case 1 -> showAllAnimals();
-                case 2 -> showAnimalsByType();
-                case 3 -> addNewAnimal();
-            }
+        int item;
+        try (Counter counter = new Counter()) {
+            do {
+                view.println("\nВыберите пункт меню");
+                view.printNumberedList(menu, 0);
+                item = selectMenuItem(0, menu.size() - 1);
+                switch (item) {
+                    case 1 -> showAllAnimals();
+                    case 2 -> showAnimalsByType();
+                    case 3 -> addNewAnimal(counter);
+                }
+            } while (item != 0);
+        } catch (IOException e) {
+            view.println(e.getMessage());
         }
         view.println("\nДо новых встреч!");
     }
 
-    private List<String> createMenuList() {
-        menu = new ArrayList<>();
+    private void createMenuList() {
         menu.add("Завершить работу и выйти");
         menu.add("Посмотреть список всех животных питомника");
         menu.add("Посмотреть список животных питомника определенного вида");
         menu.add("Добавить в питомник новое животное");
-        return menu;
     }
 
-    private List<String> createAnimalTypesList() {
-        animalTypes =  Arrays.asList(
-                "Кошка", "Собака", "Хомяк", "Лошадь", "Осёл", "Верблюд");
-        return animalTypes;
+    private void createAnimalTypesList() {
+        animalTypes.addAll(Arrays.asList(
+                "Кошка", "Собака", "Хомяк", "Лошадь", "Осёл", "Верблюд"));
     }
 
     private void showAllAnimals() {
@@ -125,7 +118,7 @@ public class AnimalController {
         }
     }
 
-    private void addNewAnimal() {
+    private void addNewAnimal(Counter counter) {
         int typeId = selectAnimalType();
         String name = getAnimalName();
         LocalDate birthday = getAnimalBirthday();
@@ -140,10 +133,10 @@ public class AnimalController {
                 case 6 -> animal = service.addNewAnimal(Camel.class, name, birthday);
                 default -> view.println("Не знаю такой вид");
             }
-            // counter
             if (animal != null) {
                 view.println("Добавлено животное: ");
                 view.println(animal.toString());
+                counter.add();
             }
         } catch (Exception e) {
             view.println(e.getMessage());

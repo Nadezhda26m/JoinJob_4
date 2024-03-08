@@ -2,7 +2,11 @@ package org.example.service;
 
 import lombok.Getter;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 /**
  *
@@ -10,22 +14,37 @@ import java.util.concurrent.atomic.AtomicLong;
 @Getter
 public class Counter implements AutoCloseable {
 
-    private String pathToLogFile = "data/";
+    private final String pathToLogFile = "data" + File.separatorChar;
 
-    private String fileName = "counter.txt";
+    private final String fileName = "counter.txt";
 
-    private final AtomicLong counter;
+    private FileWriter fileWriter;
 
-    public Counter() {
-        this.counter = new AtomicLong();
+    private int counter;
+
+    public Counter() throws IOException {
+        this.counter = 0;
+        connectToFile();
     }
 
-    public Long add() {
-        return counter.incrementAndGet();
+    public void add() throws IOException {
+        fileWriter.write("counter = " + ++counter + '\n');
+        fileWriter.flush();
     }
 
     @Override
-    public void close() throws Exception {
-        // TODO
+    public void close() throws IOException {
+        fileWriter.close();
+        Logger.getAnonymousLogger().info("Counter closed");
     }
+
+    private void connectToFile() throws IOException {
+        File file = new File(pathToLogFile);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        fileWriter = new FileWriter(
+                pathToLogFile + fileName, StandardCharsets.UTF_8, false);
+    }
+
 }
