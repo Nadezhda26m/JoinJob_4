@@ -7,47 +7,47 @@
    Переименовать файл, дав ему новое имя (Друзья человека).
 
 
-      $ cat > 'Домашние животные'
-      собаки
-      кошки
-      хомяки
-      $ cat > 'Вьючные животные'
-      лошади
-      верблюды
-      ослы
-      $ cat Домашние\ животные Вьючные\ животные > 'Общий список'
-      $ cat Общий\ список
-      собаки
-      кошки
-      хомяки
-      лошади
-      верблюды
-      ослы
-      $ mv Общий\ список 'Друзья человека'
-      $ rm Домашние\ животные Вьючные\ животные
-      $ ls
-      'Друзья человека'
+         $ cat > 'Домашние животные'
+         собаки
+         кошки
+         хомяки
+         $ cat > 'Вьючные животные'
+         лошади
+         верблюды
+         ослы
+         $ cat Домашние\ животные Вьючные\ животные > 'Общий список'
+         $ cat Общий\ список
+         собаки
+         кошки
+         хомяки
+         лошади
+         верблюды
+         ослы
+         $ mv Общий\ список 'Друзья человека'
+         $ rm Домашние\ животные Вьючные\ животные
+         $ ls
+         'Друзья человека'
 2. Создать директорию, переместить файл туда.
 
 
-      $ mkdir животные
-      $ mv Друзья\ человека животные/
+         $ mkdir животные
+         $ mv Друзья\ человека животные/
 3. Подключить дополнительный репозиторий MySQL. Установить любой пакет
    из этого репозитория.
 4. Установить и удалить deb-пакет с помощью dpkg.
 5. Выложить историю команд в терминале ubuntu
 
 
-      $ wget https://dev.mysql.com/get/mysql-apt-config_0.8.25-1_all.deb
-      Сохранение в: ‘mysql-apt-config_0.8.25-1_all.deb’
-      $ sudo dpkg -i mysql-apt-config_0.8.25-1_all.deb
-      $ sudo dpkg -l | grep mysql
-      ii  mysql-apt-config   0.8.25-1    all    Auto configuration for MySQL APT Repo.
+         $ wget https://dev.mysql.com/get/mysql-apt-config_0.8.25-1_all.deb
+         Сохранение в: ‘mysql-apt-config_0.8.25-1_all.deb’
+         $ sudo dpkg -i mysql-apt-config_0.8.25-1_all.deb
+         $ sudo dpkg -l | grep mysql
+         ii  mysql-apt-config   0.8.25-1    all    Auto configuration for MySQL APT Repo.
 
 [<img src="linux-5.png" alt="cat sources.list.d/mysql.list" width="700"/>](linux-5.png)
 
-      $ sudo apt update (без ошибок)
-      $ sudo dpkg -r mysql-apt-config
-      Удаляется mysql-apt-config (0.8.25-1) …
-      $ sudo dpkg -l | grep mysql
-      $ rc  mysql-apt-config  …
+         $ sudo apt update (без ошибок)
+         $ sudo dpkg -r mysql-apt-config
+         Удаляется mysql-apt-config (0.8.25-1) …
+         $ sudo dpkg -l | grep mysql
+         $ rc  mysql-apt-config  …
