@@ -11,6 +11,7 @@ import org.example.model.domestic.Hamster;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -18,42 +19,101 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AnimalCollectionRepository implements AnimalRepository {
 
+    /**
+     * Список всех животных, сохраненных в репозитории
+     */
     private final List<Animal> animals;
 
+    /**
+     * Уникальный идентификатор животного
+     */
     private final AtomicLong id;
 
+    /**
+     * Конструктор для инициализации полей и добавления начальных данных о животных
+     */
     public AnimalCollectionRepository() {
         this.animals = new ArrayList<>();
         this.id = new AtomicLong();
         init();
     }
 
+    /**
+     * Получение списка всех животных.
+     * @return список всех животных
+     */
     @Override
     public List<Animal> findAll() {
         return animals;
     }
 
+    /**
+     * Получение списка животных определенного класса-наследника Animal.
+     * @param type класс-наследник Animal
+     * @return список животных указанного вида
+     * @param <E> класс-наследник Animal
+     */
     @Override
-    public <T extends Animal> List<T> findByType(Class<T> type) {
-        // List<T> list = new ArrayList<>();
+    public <E extends Animal> List<Animal> findByType(Class<E> type) {
+        // List<Animal> list = new ArrayList<>();
         // for (var animal : animals) {
         //     if (type.isAssignableFrom(animal.getClass())) {
-        //         list.add((T) animal); } }
+        //         list.add(animal); } }
         // return list;
-
         return animals.stream()
                 .filter(type::isInstance)
-                .map(type::cast)
                 .toList();
     }
 
+    /**
+     * Сохранение или обновление сущности в репозитории.
+     * @param entity сущность для сохранения или обновления
+     * @return сохраненная сущность
+     */
     @Override
-    public <E extends Animal> E save(E entity) {
-        entity.setId(id.incrementAndGet());
-        animals.add(entity);
+    public Animal save(Animal entity) {
+        int index = findIndexById(entity.getId());
+        if (index == -1) {
+            entity.setId(id.incrementAndGet());
+            animals.add(entity);
+        } else {
+            animals.set(index, entity);
+        }
         return entity;
     }
 
+    /**
+     * Поиск сущности с указанным ID.
+     * @param id уникальный идентификатор сущности
+     * @return Optional объект сущности с указанным ID
+     */
+    @Override
+    public Optional<Animal> findById(Long id) {
+        if (id == null) return Optional.empty();
+        return animals.stream()
+                .filter(animal -> animal.getId().equals(id))
+                .findFirst();
+    }
+
+    /**
+     * Поиск индекса сущности с указанным ID в списке животных
+     * @param id уникальный идентификатор животного
+     * @return индекс сущности в списке животных или -1, если такого ID не найдено
+     */
+    private int findIndexById(Long id) {
+        if (id != null) {
+            for (int i = 0; i < animals.size(); i++) {
+                if (animals.get(i).getId().equals(id)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Задание начального списка животных
+     */
     private void init() {
         save(new Dog("Шарик",
                 LocalDate.now().minusYears(1).minusMonths(2)));

@@ -1,31 +1,69 @@
 package org.example.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Животные
+ * Родительский класс всех животных
  */
+@EqualsAndHashCode
+@Getter
 public abstract class Animal {
 
+    /**
+     * Уникальный идентификатор животного
+     */
     protected Long id;
 
+    /**
+     * Группа животного
+     */
     protected String animalGroup;
+
+    /**
+     * Вид животного
+     */
     protected String animalType;
 
+    /**
+     * Кличка животного
+     */
     protected String name;
+
+    /**
+     * Дата рождения животного
+     */
     protected LocalDate birthday;
+
+    /**
+     * Список команд, которым обучено животное
+     */
     protected List<Command> commands;
 
-    public Animal(String animalGroup, String animalType, String name, LocalDate birthday) {
+    /**
+     * Конструктор класса.
+     * @param animalGroup группа животного
+     * @param animalType вид животного
+     * @param name кличка животного
+     * @param birthday дата рождения животного
+     * @param commands список команд
+     */
+    public Animal(String animalGroup, String animalType, String name,
+                  LocalDate birthday, List<Command> commands) {
         this.animalGroup = animalGroup;
         this.animalType = animalType;
         this.name = name;
         this.birthday = birthday;
-        this.commands = new ArrayList<>();
+        this.commands = commands;
     }
 
+    /**
+     * Получение строки с полной информацией о животном.
+     * @return строковое представление сущности животного
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -38,7 +76,23 @@ public abstract class Animal {
         return sb.toString();
     }
 
+    /**
+     * Получение строки с информацией о ID, виде и кличке животного.
+     * @return строка с краткой информацией о животном
+     */
+    public String getShortInfo() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id=").append(id);
+        sb.append(", вид: ").append(animalType);
+        sb.append(", кличка: ").append(name);
+        return sb.toString();
+    }
+
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setCommands(List<Command> commands) {
+        this.commands = commands;
     }
 }

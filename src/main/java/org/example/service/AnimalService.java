@@ -2,32 +2,157 @@ package org.example.service;
 
 import org.example.exception.IncorrectDataException;
 import org.example.model.Animal;
+import org.example.model.Command;
+import org.example.model.baggage.Camel;
+import org.example.model.baggage.Donkey;
+import org.example.model.baggage.Horse;
+import org.example.model.domestic.Cat;
+import org.example.model.domestic.Dog;
+import org.example.model.domestic.Hamster;
 import org.example.repository.AnimalRepository;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Сервис для работы с данными о животных
+ */
 public class AnimalService {
 
+    /**
+     * Интерфейс репозитория для работы с данными о животных
+     */
     private final AnimalRepository repository;
 
+    /**
+     * Сервис для работы с командами
+     */
+    private final CommandsService commandsService;
+
+    /**
+     * Объект для связи классов-наследников Animal (Value) и их строкового представления (Key)
+     */
+    private final Map<String, Class<? extends Animal>> animalTypes;
+
+    /**
+     * Конструктор класса для подключения к конкретному классу репозитория.
+     * Подключение к сервису команд и добавление списка классов-наследников Animal.
+     * @param repository класс репозитория, реализующий интерфейс AnimalRepository
+     */
     public AnimalService(AnimalRepository repository) {
         this.repository = repository;
+        this.commandsService = new CommandsService();
+        this.animalTypes = new HashMap<>();
+        specifyAnimalTypes();
     }
 
-    public <T extends Animal> T addNewAnimal(
-            Class<T> animalType, String name, LocalDate birthday
-    )
+    /**
+     * Задание пар для связи классов-наследников Animal (Value) и их строкового представления (Key)
+     */
+    private void specifyAnimalTypes() {
+        animalTypes.put("Кошка", Cat.class);
+        animalTypes.put("Собака", Dog.class);
+        animalTypes.put("Хомяк", Hamster.class);
+        animalTypes.put("Лошадь", Horse.class);
+        animalTypes.put("Осёл", Donkey.class);
+        animalTypes.put("Верблюд", Camel.class);
+    }
+
+    /**
+     * Создание животного указанного вида, задание клички и даты рождения животного,
+     * сохранение созданного животного в репозитории.
+     * @param type вид животного (значение ключа в словаре классов-наследников)
+     * @param name кличка животного
+     * @param birthday дата рождения животного
+     * @return сохраненная сущность животного
+     * @throws NoSuchMethodException не найден указанный конструктор
+     * @throws InvocationTargetException исключение, которое вызывает указанный конструктор
+     * @throws InstantiationException вызов конструктора абстрактного класса
+     * @throws IllegalAccessException отсутствие доступа к базовому конструктору
+     */
+    public Animal addNewAnimal(String type, String name, LocalDate birthday)
             throws NoSuchMethodException, InvocationTargetException,
             InstantiationException, IllegalAccessException {
-
-        var animal = animalType
+        Animal animal = animalTypes.get(type)
                 .getDeclaredConstructor(String.class, LocalDate.class)
                 .newInstance(getCorrectName(name), birthday);
         return repository.save(animal);
     }
 
+    /**
+     * Обновление информации о животном в репозитории, если животное с указанным ID существует.
+     * В ином случае будет добавлена новая запись с присвоеннием ID.
+     * @param animal объект животного для добавления или обновления
+     * @return сохраненная сущность животного
+     */
+    public Animal addOrUpdateAnimal(Animal animal) {
+        return repository.save(animal);
+    }
+
+    /**
+     * Проверка клички животного на корректность. Кличка не должна быть короче 2
+     * и длинее 30 символов. Допускается одно слово или два слова, разделенных пробелом
+     * или тире, записанные буквами русского алфавита в любом регистре.
+     * Может вызывать исключения.
+     * @param name кличка животного для проверки
+     * @return результат проверки на коректность
+     */
+    public boolean isCorrectName(String name) {
+        if (name == null || name.isEmpty())
+            throw new IncorrectDataException("Имя не задано");
+        if (name.trim().length() > 30)
+            throw new IncorrectDataException("Слишком длинное имя");
+        // Мурзик, или Микки Маус, или Бер-Бера
+        if (!name.trim().matches("[А-ЯЁа-яё]{2,}([\s\\-][А-ЯЁа-яё]{2,})?"))
+            throw new IncorrectDataException(
+                    "Некорректные данные. Нельзя задать имя '" + name + '\'');
+        return true;
+    }
+
+    /**
+     * Получение отсортированного списка всех доступных команд.
+     * @return список доступных команд
+     */
+    public List<Command> getAllCommands() {
+        return commandsService.getSortedList();
+    }
+
+    /**
+     * Создание новой команды. Выдаст исключение, если переданное название некорректно
+     * или команда с указанным названием уже существует.
+     * @param command название команды для добавления
+     * @return объект созданной команды
+     */
+    public Command createNewCommand(String command) {
+        return commandsService.createNewCommand(command);
+    }
+
+    /**
+     * Получение списка всех животных из репозитория.
+     * @return список животных
+     */
+    public List<Animal> getAllAnimals() {
+        return repository.findAll();
+    }
+
+    /**
+     * Получение списка животных определенного класса-наследника Animal.
+     * @param type вид животного (значение ключа в словаре классов-наследников)
+     * @return список животных указанного вида
+     */
+    public List<Animal> getAnimalsByType(String type) {
+        return repository.findByType(animalTypes.get(type));
+    }
+
+    /**
+     * Получение корректной записи клички животного, где первая буква каждого слова
+     * заглавная, а остальные строчные.
+     * @param name кличка животного
+     * @return корректная запись клички животного
+     */
     private String getCorrectName(String name) {
         String s = name.trim().toLowerCase();
         StringBuilder sb = new StringBuilder();
@@ -46,29 +171,20 @@ public class AnimalService {
         return sb.toString();
     }
 
-    public boolean isCorrectName(String name) {
-        if (name == null || name.isEmpty())
-            throw new NullPointerException("Имя не задано");
-        if (name.trim().length() > 25) {
-            throw new IncorrectDataException(
-                    "Слишком длинное имя");
-        }
-        // начинается с 2 и более а-я, 1 или 0 раз через пробел или тире еще одно слово не менее 2 символов
-        // Мурзик, или Микки Маус, или Бер-Бера
-        if (!name.trim().matches("[А-ЯЁа-яё]{2,}([\s\\-][А-ЯЁа-яё]{2,})?"))
-            throw new IncorrectDataException(
-                    "Некорректные данные. Нельзя задать имя '" + name + '\'');
-        return true;
+    /**
+     * Получение списка ключей-названий доступных классов-наследников (видов) животных.
+     * @return список доступных видов животных
+     */
+    public List<String> getAnimalTypes() {
+        return animalTypes.keySet().stream().toList();
     }
 
-
-    public List<Animal> getAllAnimals() {
-        return repository.findAll();
+    /**
+     * Получение животного с указанным ID
+     * @param id уникальный идентификатор животного
+     * @return объект найденного животного или null
+     */
+    public Animal getAnimalById(Long id) {
+        return repository.findById(id).orElse(null);
     }
-
-    public <T extends Animal> List<T> getAnimalsByType(Class<T> type) {
-        return repository.findByType(type);
-    }
-
-
 }
